@@ -30,7 +30,7 @@ source_url <- "https://www.oregon.gov/osp/Docs/Open-Data/OpenData-Arrests-All.cs
 filename <- "data/OpenData-Arrests-All.csv"
   
 # Set the working directory this script is located
-setwd("/home/russell/Dropbox/DataAnalysis/Eugene_Race/")
+setwd("/home/russell/Dropbox/DataAnalysis/Oregon_Arrest_Racial_Bias/")
 
 # Load in arrest data, look for local data set, if not download from source
 if(!file.exists(filename)){
