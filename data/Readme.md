@@ -2,4 +2,10 @@
 
 data used in project
 
-citylim_2021 and or_counties or from  https://spatialdata.oregonexplorer.info/geoportal and used as cartographic elements in the maps.
+the shapefiles in 
+
+    * /data/citylim_2021/
+    * /data/or_counties/
+    
+    
+ are from  https://spatialdata.oregonexplorer.info/geoportal and used as cartographic elements in the maps.
