@@ -4,7 +4,7 @@ output:
   pdf_document: default
 ---
 
-<!-- # Filename: Oregon_Arrest_Race.rmd -->
+<!-- # : Oregon_Arrest_Race.rmd -->
 
 <!-- # Author: @russl_corey -->
 
@@ -44,7 +44,8 @@ library(knitr)
 ```
 
 ```{r load crime data, echo=FALSE, message=FALSE, warning=FALSE}
-setwd('/home/russell/Dropbox/DataAnalysis/Oregon_Arrest_Racial_Bias')
+
+ setwd('/home/russell/Dropbox/DataAnalysis/Oregon_Arrest_Racial_Bias')
 
 source("Arrests_and_Census.r")
 
@@ -77,7 +78,9 @@ The Oregon census data can be found at the website
 First arrest data is loaded with OpenData-Arrests.r which reads in the corresponding data source
  data/OpenData-Arrests.r. The arrests are then grouped by police agency and race. 
  
-Next, census data is loaded using City_data_2020.r which reads data/City_data_2020.xlsx.
+Next, census data is loaded using City_data_2020.r which reads data/City_data_2020.xlsx. There are several 
+categories of racial demographics. I picked the set that is mutually exclusive, so the total amounts
+of each race will add up to 100% of the total population. 
 
 Then using Arrests_and_Census.r and the table data/agencies_cities_map_cities_only.csv the names of police departments are 
 joined to the city names in City_data_2020. Only cities with corresponding police departments are kept. 
@@ -100,28 +103,23 @@ agency_pop %>% select(city,  black_diff, latino_diff, native_diff,
   kable()
 
 ```
+```{r race bias pie chart, echo=FALSE, message=FALSE, warninig=FALSE}
 
+portland <- agency_pop[agency_pop$city_trim == 'Portland',]
+
+data_pop <- portland %>% select( 'native', 'asian', 'black','latino', 'pacific', 'other', 'white')
+
+data_arrest <- portland %>% select( 'native_arrests', 'asian_arrests', 'black_arrests', 'latino_arrests','pacific_arrests', 'other_arrests', 'white_arrests')
+
+pie(t(data_pop), labels=c( ' ', 'asian', 'black', 'latino',' ', ' ', 'white'), 
+    main="Portland Population")
+
+pie(t(data_arrest), labels=c( '','asian arrests','black arrests', 'latino arrests','', '', 'white arrests'), 
+    main="Portland Arrests")
+
+```
 # Result Visualiazion
 
-```{r Plot results map, echo=FALSE, message=FALSE, warning=FALSE}
-library(rgdal)         # for readOGR(...)
-library(ggplot2)
-library(sf)
-
-agencies <- read_sf("data/geo_agency/geo_agency.shp")
-area <-  read_sf("data/or_counties/or_counties.shp")
-
-# define IDs for the polygons
-area$id = rownames(area)
-
-#area.map <- fortify(area, region = 'id')
-
-ggplot() +
-  geom_sf(data=area) +
-  geom_sf(data=agencies)+
-  labs(title='Agencies Used in Arrest Bias Study') +
-   theme_void()
-```
 Map plots of each racial bias 
 
 
@@ -193,6 +191,19 @@ agency_pop %>%
 
 ```
 
+For comparison, the Pearson's correlation.
+```{r Pearson correlation, echo=FALSE, warning=FALSE}
+agency_pop %>%
+  select(c('native_diff', 'asian_diff', 'black_diff', 'latino_diff', 
+            'pacific_diff', 'white_diff','native_percnt', 
+           'black_percnt', 'asian_percnt', 'latino_percnt',
+           'white_percnt')) %>%
+  cor() %>%
+ ggcorrplot(show.diag = FALSE, type = 'lower', lab=TRUE) +  
+  ggplot2::theme(axis.text.y=ggplot2::element_text(size=10),
+                 axis.text.x=ggplot2::element_text(size=8),
+                 legend.text=ggplot2::element_text(size=10))
+```
 Closer inspection of data fields with statistically significant correlation values.
 ```{r Linear plots of Correlations, echo=FALSE}
 agency_pop %>%
@@ -267,8 +278,39 @@ agency_pop %>% select(city,black_diff, latino_diff, native_diff,
 
 \newpage
 
-# Appendix A3 Data Distributions
-```{r appendix A3, echo=FALSE, message=FALSE}
+# Appendix A3 Arrest Biases Arranged
+
+```{r appendi A3, echo=FALSE, message=FALSE}
+
+agency_pop %>% select(city, asian_diff, asian_arrests_percnt, asian_percnt) %>%
+  arrange(desc(asian_diff)) %>%
+  kable()
+
+agency_pop %>% select(city,  black_diff, black_arrests_percnt, black_percnt) %>%
+  arrange(desc(black_diff)) %>%
+  kable()
+
+agency_pop %>% select(city,  latino_diff, latino_arrests_percnt, latino_percnt) %>%
+  arrange(desc(latino_diff)) %>%
+  kable()
+
+agency_pop %>% select(city,  native_diff, native_arrests_percnt, native_percnt) %>%
+  arrange(desc(native_diff)) %>%
+  kable()
+
+agency_pop %>% select(city,  other_diff, other_arrests_percnt, other_percnt) %>%
+  arrange(desc(other_diff)) %>%
+  kable()
+
+agency_pop %>% select(city,  pacific_diff, pacific_arrests_percnt, pacific_percnt) %>%
+  arrange(desc(pacific_diff)) %>%
+  kable()
+```
+
+\newpage
+
+# Appendix A4 Data Distributions
+```{r appendix A4, echo=FALSE, message=FALSE}
 
 
 for(data_label in c('latino_arrests_percnt', 'black_arrests_percnt', 'native_arrests_percnt',
